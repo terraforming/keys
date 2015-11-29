@@ -1,3 +1,42 @@
+first you need to setup chef-server
+
+installation goes like a charm, you can see it in main.tf.
+
+resource is called 
+resource "aws_instance" "chef-server" {
+
+installation is pretty forward until we need to mess with permission keys and users.
+
+1) creating user and organizaiton
+   "sudo chef-server-ctl user-create otaykalo oleg taykalo oleg.taykalo@gmail.com abcd123 --filename /home/ubuntu/otaykalo.pem",
+
+       "sudo chef-server-ctl org-create nowhereland 'nowhereLand inc.' --association_user otaykalo --filename /home/ubuntu/nowhere-validator.pem",
+
+       after this step we will need to copy these key files to all chef agents.
+
+  2)     simple, but  not extremely secure way to share files is to use github repo.
+
+"git clone https://github.com/terraforming/keys.git",
+       "cd keys",
+       "cp ~/otaykalo.pem .",
+       "cp ~/nowhere-validator.pem .",
+       
+ 3) also for chef to work agents need DNS name and not ip adress as the part of setup. But not only this, they need to trust server's https certificate. If we are using self-signed cert, we will fail. So the next step is copy server's certificate and add it to trusted certs on agents. Server cert is distributed via github.  following lines do the trick.
+"sudo cp /etc/opscode/webui_priv.pem /home/ubuntu/keys/",
+       "sudo cp /etc/opscode/worker-private.pem /home/ubuntu/keys/",
+       "sudo chmod 640 *.pem",
+         
+        
+       "sudo cp /var/opt/opscode/nginx/ca/${aws_instance.chef-server.private_dns}.crt /home/ubuntu/keys/${aws_instance.chef-server.private_dns}.crt",
+       "sudo chmod 666 /home/ubuntu/keys/${aws_instance.chef-server.private_dns}.crt",
+       "git add .",
+       "git config --global user.name 'terraform bot'", 
+       "git config --global user.email 'terraform@terraform.com'",
+       "git commit -m 'abc'",
+       "git push --repo https://terraforming:1qaz2wsx@github.com/terraforming/keys.git"
+       
+4) 
+
 TO FIX THIS ERROR:
 
 If the server you are connecting to uses a self-signed certificate, you must
