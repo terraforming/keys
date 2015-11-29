@@ -1,0 +1,25 @@
+TO FIX THIS ERROR:
+
+If the server you are connecting to uses a self-signed certificate, you must
+configure chef to trust that server's certificate.
+
+By default, the certificate is stored in the following location on the host
+where your chef-server runs:
+
+  /var/opt/opscode/nginx/ca/SERVER_HOSTNAME.crt
+
+Copy that file to your trusted_certs_dir (currently: /home/ubuntu/.chef/trusted_certs)
+using SSH/SCP or some other secure method, then re-run this command to confirm
+that the server's certificate is now trusted.
+
+
+
+log_level                :info
+log_location             STDOUT
+node_name                'otaykalo'
+client_key               '/home/ubuntu/.chef/otaykalo.pem'
+validation_client_name   'nowhere-validator'
+validation_key           '/home/ubuntu/.chef/nowhere-validator.pem'
+chef_server_url          'https://ip-172-31-8-162.us-west-2.compute.internal:443'
+syntax_check_cache_path  '/home/ubuntu/.chef/syntax_check_cache'
+
